@@ -1,0 +1,32 @@
+@import url("https://fonts.googleapis.com/css2?family=Allura&family=Beth+Ellen&family=Calligraffitti&family=Caveat:wght@400;700&family=Cedarville+Cursive&family=Damion&family=Dancing+Script:wght@400;700&family=Dawning+of+a+New+Day&family=Fuggles&family=Homemade+Apple&family=Lobster&family=Lovers+Quarrel&family=Pacifico&family=Parisienne&family=Ruthie&family=Sacramento&family=Satisfy&family=Style+Script&family=WindSong:wght@400;500&family=Yellowtail&family=Zeyada&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: #f6f3ee;
+}
+
+body {
+  min-height: 100%;
+  margin: 0;
+  background:
+    radial-gradient(circle at top left, rgba(10, 143, 124, 0.1), transparent 34rem),
+    linear-gradient(180deg, #fffaf3 0, #f6f3ee 34rem, #f8f8f6 100%);
+  color: #1c2430;
+}
+
+button,
+input {
+  font: inherit;
+}

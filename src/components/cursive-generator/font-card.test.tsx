@@ -27,7 +27,9 @@ describe("FontCard", () => {
     expect(screen.getByText(longPreviewText)).not.toHaveClass("overflow-visible");
   });
 
-  it("uses concise accessible name for the main select button", () => {
+  it("keeps the style name accessible without rendering it as card text", () => {
+    const onSelect = vi.fn();
+
     render(
       <FontCard
         dictionary={getDictionary("en")}
@@ -35,14 +37,21 @@ describe("FontCard", () => {
         isSelected={false}
         onCopy={vi.fn()}
         onPreview={vi.fn()}
-        onSelect={vi.fn()}
+        onSelect={onSelect}
         previewText="hello world"
         textStyle={textStyles[0]}
       />
     );
 
-    expect(screen.getByRole("button", { name: "Unicode Script" })).toBeInTheDocument();
+    const selectButton = screen.getByRole("button", { name: "Unicode Script" });
+
+    expect(selectButton).toBeInTheDocument();
+    expect(screen.queryByText("Unicode Script")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Recommended platforms/ })).not.toBeInTheDocument();
+
+    fireEvent.click(selectButton);
+
+    expect(onSelect).toHaveBeenCalledWith(textStyles[0]);
   });
 
   it("does not show extra copyable status inside copyable cards", () => {
@@ -182,8 +191,9 @@ describe("FontCard", () => {
 
     expect(selectedCard).toHaveClass("bg-[#087565]");
     expect(selectedCard).toHaveClass("border-[#087565]");
+    expect(selectButton).toHaveAttribute("aria-pressed", "true");
     expect(selectedSourceIcon).toHaveClass("text-white");
     expect(screen.getByText("hello world")).toHaveClass("text-white");
-    expect(screen.getByText(textStyles[6].displayName)).toHaveClass("text-white");
+    expect(screen.queryByText(textStyles[6].displayName)).not.toBeInTheDocument();
   });
 });

@@ -12,6 +12,7 @@ import { StylePreviewPanel } from "./style-preview-panel";
 import { Textarea } from "@/components/ui/textarea";
 import { writeClipboardText } from "@/lib/clipboard-writer";
 import { saveNodeAsPng } from "@/lib/export-image";
+import { ensureGoogleFontForStyle } from "@/lib/google-font-loader";
 import type { getDictionary, Locale } from "@/lib/i18n";
 import { getCopyText, transformUnicodeText } from "@/lib/text-transform";
 import {
@@ -84,6 +85,12 @@ export function CursiveGeneratorPage({ dictionary, locale }: CursiveGeneratorPag
     };
   }, []);
 
+  useEffect(() => {
+    if (selectedStyle.kind === "google-font") {
+      void ensureGoogleFontForStyle(selectedStyle);
+    }
+  }, [selectedStyle]);
+
   function getPreviewText(textStyle: TextStyle): string {
     if (textStyle.kind === "unicode") {
       return transformUnicodeText(inputText, textStyle);
@@ -137,6 +144,7 @@ export function CursiveGeneratorPage({ dictionary, locale }: CursiveGeneratorPag
       throw new Error("PNG export target is missing");
     }
 
+    await ensureGoogleFontForStyle(selectedStyle);
     await saveNodeAsPng(exportNodeRef.current, `cursive-generator-${selectedStyle.id}.png`);
   }
 

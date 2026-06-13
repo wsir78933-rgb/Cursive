@@ -1,6 +1,17 @@
 import React from "react";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+const fontLoaderMocks = vi.hoisted(() => ({
+  ensureGoogleFontForStyle: vi.fn(() => Promise.resolve())
+}));
+
+const exportImageMocks = vi.hoisted(() => ({
+  saveNodeAsPng: vi.fn(() => Promise.resolve())
+}));
+
+vi.mock("@/lib/google-font-loader", () => fontLoaderMocks);
+vi.mock("@/lib/export-image", () => exportImageMocks);
 
 import { CursiveGeneratorPage } from "./cursive-generator-page";
 import { getDictionary } from "@/lib/i18n";
@@ -13,6 +24,13 @@ function mockClipboardWriteText(writeText: ReturnType<typeof vi.fn>) {
 }
 
 describe("CursiveGeneratorPage", () => {
+  beforeEach(() => {
+    fontLoaderMocks.ensureGoogleFontForStyle.mockReset();
+    fontLoaderMocks.ensureGoogleFontForStyle.mockResolvedValue(undefined);
+    exportImageMocks.saveNodeAsPng.mockReset();
+    exportImageMocks.saveNodeAsPng.mockResolvedValue(undefined);
+  });
+
   it("shows clear feedback when clipboard copy fails", async () => {
     mockClipboardWriteText(vi.fn().mockRejectedValue(new Error("permission denied")));
 
@@ -43,10 +61,52 @@ describe("CursiveGeneratorPage", () => {
 
     render(<CursiveGeneratorPage dictionary={getDictionary("en")} locale="en" />);
 
-    fireEvent.click(screen.getByText("Mistral"));
+    fireEvent.click(screen.getByRole("button", { name: "Mistral" }));
 
     expect(screen.getByLabelText("Your text")).toHaveStyle({
       fontFamily: "Mistral, cursive"
+    });
+  });
+
+  it("loads a selected Google font and waits for it before saving PNG output", async () => {
+    mockClipboardWriteText(vi.fn());
+    let resolveFontLoad: () => void = () => {};
+    const fontLoadPromise = new Promise<void>((resolve) => {
+      resolveFontLoad = resolve;
+    });
+    fontLoaderMocks.ensureGoogleFontForStyle.mockReturnValue(fontLoadPromise);
+
+    render(<CursiveGeneratorPage dictionary={getDictionary("en")} locale="en" />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Dancing Script" }));
+
+    await waitFor(() => {
+      expect(fontLoaderMocks.ensureGoogleFontForStyle).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: "dancing-script",
+          kind: "google-font"
+        })
+      );
+    });
+    expect(screen.getByLabelText("Your text").style.fontFamily).toContain("Dancing Script");
+    expect(screen.getByTestId("main-style-preview-output").style.fontFamily).toContain(
+      "Dancing Script"
+    );
+    expect(screen.getByTestId("png-export-output").style.fontFamily).toContain(
+      "Dancing Script"
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+
+    expect(exportImageMocks.saveNodeAsPng).not.toHaveBeenCalled();
+
+    resolveFontLoad();
+
+    await waitFor(() => {
+      expect(exportImageMocks.saveNodeAsPng).toHaveBeenCalledWith(
+        screen.getByTestId("png-export-output"),
+        "cursive-generator-dancing-script.png"
+      );
     });
   });
 

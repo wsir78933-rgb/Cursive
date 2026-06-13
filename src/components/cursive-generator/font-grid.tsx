@@ -28,7 +28,7 @@ export function FontGrid({
   onSelectStyle
 }: FontGridProps) {
   return (
-    <section className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-3 px-4 pb-12 sm:grid-cols-2 md:px-8 lg:grid-cols-3 xl:grid-cols-4">
+    <section className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-3 px-4 pb-12 sm:grid-cols-2 md:px-8 lg:grid-cols-3 xl:grid-cols-5">
       {styles.map((textStyle) => (
         <FontCard
           dictionary={dictionary}

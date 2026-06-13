@@ -48,7 +48,7 @@ export function FontCard({
       <button
         aria-label={textStyle.displayName}
         aria-pressed={isSelected}
-        className="flex h-full w-full min-w-0 flex-col items-center justify-center px-4 pb-4 pt-9 text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="flex h-full w-full min-w-0 flex-col items-center justify-center px-4 py-8 text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         onClick={() => onSelect(textStyle)}
         type="button"
       >
@@ -62,15 +62,6 @@ export function FontCard({
           title={previewText}
         >
           {previewText || "\u00a0"}
-        </div>
-        <div
-          className={cn(
-            "mt-4 max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-sm font-semibold leading-tight text-slate-600",
-            isSelected && "text-white"
-          )}
-          title={textStyle.displayName}
-        >
-          {textStyle.displayName}
         </div>
       </button>
       <button

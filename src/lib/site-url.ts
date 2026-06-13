@@ -1,6 +1,6 @@
 export const siteOrigin = "https://cursivegenerator.pro";
 
-export const englishCanonicalPath = "/";
+export const englishCanonicalPath = "";
 export const chineseCanonicalPath = "/zh/cursive-text-generator";
 
 export const canonicalUrls = {

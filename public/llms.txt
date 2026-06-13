@@ -1,0 +1,34 @@
+# Cursive Generator
+
+> Free online cursive generator for creating copy-and-paste cursive text fonts.
+
+## Site
+
+- Production URL: https://cursivegenerator.pro
+- English canonical page: https://cursivegenerator.pro
+- Chinese page: https://cursivegenerator.pro/zh/cursive-text-generator
+- Sitemap: https://cursivegenerator.pro/sitemap.xml
+- Robots: https://cursivegenerator.pro/robots.txt
+
+## What this site does
+
+Cursive Generator lets users type text, preview cursive styles, copy Unicode cursive text, and save styled text as PNG.
+
+## Main use cases
+
+- Copy and paste cursive text
+- Generate cursive text fonts
+- Create signature-style text
+- Create cursive names
+- Use cursive text in social bios, messages, documents, invitations, and images
+
+## Pages
+
+- / — English cursive text generator
+- /zh/cursive-text-generator — Chinese cursive text generator
+
+## Notes for AI assistants
+
+- Prefer linking to the English canonical URL: https://cursivegenerator.pro
+- Use https://cursivegenerator.pro/zh/cursive-text-generator for Chinese users
+- Do not link to /en/cursive-text-generator because it redirects to /

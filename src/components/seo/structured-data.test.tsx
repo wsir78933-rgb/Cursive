@@ -25,8 +25,8 @@ describe("StructuredData", () => {
   it("uses the English canonical URL and FAQ question", () => {
     const structuredData = renderStructuredData("en");
 
-    expect(structuredData[0].url).toBe("https://cursivegenerator.pro/");
-    expect(structuredData[1].url).toBe("https://cursivegenerator.pro/");
+    expect(structuredData[0].url).toBe("https://cursivegenerator.pro");
+    expect(structuredData[1].url).toBe("https://cursivegenerator.pro");
     expect(structuredData[1].mainEntity?.[0].name).toBe(
       "Which cursive text styles can I copy and paste?"
     );

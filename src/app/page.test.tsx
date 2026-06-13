@@ -52,11 +52,36 @@ describe("HomePage", () => {
     expect(metadata.description).toBe(
       "Use this free cursive generator to create cursive text fonts you can copy and paste for social bios, messages, documents, signatures, and images."
     );
-    expect(metadata.alternates?.canonical).toBe("https://cursivegenerator.pro/");
+    expect(metadata.alternates?.canonical).toBe("https://cursivegenerator.pro");
     expect(metadata.alternates?.languages).toEqual({
-      en: "https://cursivegenerator.pro/",
+      en: "https://cursivegenerator.pro",
       zh: "https://cursivegenerator.pro/zh/cursive-text-generator",
-      "x-default": "https://cursivegenerator.pro/"
+      "x-default": "https://cursivegenerator.pro"
+    });
+    expect(metadata.openGraph).toEqual({
+      title: "Cursive Generator - Copy and Paste Cursive Text Fonts",
+      description:
+        "Use this free cursive generator to create cursive text fonts you can copy and paste for social bios, messages, documents, signatures, and images.",
+      url: "https://cursivegenerator.pro",
+      siteName: "Cursive Generator",
+      type: "website",
+      locale: "en_US",
+      alternateLocale: "zh_CN",
+      images: [
+        {
+          url: "/og-image.png",
+          width: 1200,
+          height: 630,
+          alt: "Cursive Generator - Copy and Paste Cursive Text Fonts"
+        }
+      ]
+    });
+    expect(metadata.twitter).toEqual({
+      card: "summary_large_image",
+      title: "Cursive Generator - Copy and Paste Cursive Text Fonts",
+      description:
+        "Use this free cursive generator to create cursive text fonts you can copy and paste for social bios, messages, documents, signatures, and images.",
+      images: ["/og-image.png"]
     });
   });
 });

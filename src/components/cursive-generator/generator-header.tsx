@@ -12,14 +12,16 @@ type GeneratorHeaderProps = {
 };
 
 export function GeneratorHeader({ dictionary, locale }: GeneratorHeaderProps) {
-  const nextLocale = locale === "en" ? "zh" : "en";
+  const homeHref = locale === "en" ? "/" : `/${locale}/cursive-text-generator`;
+  const faqHref = locale === "en" ? "/#faq" : `/${locale}/cursive-text-generator#faq`;
+  const nextLocaleHref = locale === "en" ? "/zh/cursive-text-generator" : "/";
   const localeLabel = locale === "en" ? "中文" : "EN";
 
   return (
     <header className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-5 md:px-8">
       <Link
         className="group flex items-center gap-3 text-base font-semibold text-ink"
-        href={`/${locale}/cursive-text-generator`}
+        href={homeHref}
       >
         <Image
           alt="Cursive Generator icon"
@@ -32,10 +34,10 @@ export function GeneratorHeader({ dictionary, locale }: GeneratorHeaderProps) {
       </Link>
       <nav className="flex items-center gap-2">
         <Button asChild size="sm" variant="ghost">
-          <Link href={`/${locale}/cursive-text-generator#faq`}>FAQ</Link>
+          <Link href={faqHref}>FAQ</Link>
         </Button>
         <Button asChild size="sm" variant="outline">
-          <Link href={`/${nextLocale}/cursive-text-generator`}>{localeLabel}</Link>
+          <Link href={nextLocaleHref}>{localeLabel}</Link>
         </Button>
       </nav>
     </header>

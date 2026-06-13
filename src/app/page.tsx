@@ -7,14 +7,39 @@ import { canonicalUrls, hreflangAlternates, siteOrigin } from "@/lib/site-url";
 
 const dictionary = getDictionary("en");
 
+const englishTitle = "Cursive Generator - Copy and Paste Cursive Text Fonts";
+const englishDescription =
+  "Use this free cursive generator to create cursive text fonts you can copy and paste for social bios, messages, documents, signatures, and images.";
+const ogImage = {
+  url: "/og-image.png",
+  width: 1200,
+  height: 630,
+  alt: englishTitle
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteOrigin),
-  title: "Cursive Generator - Copy and Paste Cursive Text Fonts",
-  description:
-    "Use this free cursive generator to create cursive text fonts you can copy and paste for social bios, messages, documents, signatures, and images.",
+  title: englishTitle,
+  description: englishDescription,
   alternates: {
     canonical: canonicalUrls.en,
     languages: hreflangAlternates
+  },
+  openGraph: {
+    title: englishTitle,
+    description: englishDescription,
+    url: canonicalUrls.en,
+    siteName: "Cursive Generator",
+    type: "website",
+    locale: "en_US",
+    alternateLocale: "zh_CN",
+    images: [ogImage]
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: englishTitle,
+    description: englishDescription,
+    images: [ogImage.url]
   }
 };
 

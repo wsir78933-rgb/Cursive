@@ -15,4 +15,24 @@ describe("GeneratorHeader", () => {
     expect(brandIcon).toHaveClass("h-9");
     expect(brandIcon).toHaveClass("w-9");
   });
+
+  it("links English navigation directly to canonical root URLs", () => {
+    render(<GeneratorHeader dictionary={getDictionary("en")} locale="en" />);
+
+    expect(screen.getByRole("link", { name: /Cursive Generator/i })).toHaveAttribute(
+      "href",
+      "/"
+    );
+    expect(screen.getByRole("link", { name: "FAQ" })).toHaveAttribute("href", "/#faq");
+    expect(screen.getByRole("link", { name: "中文" })).toHaveAttribute(
+      "href",
+      "/zh/cursive-text-generator"
+    );
+  });
+
+  it("links the Chinese language switch directly to the English canonical root", () => {
+    render(<GeneratorHeader dictionary={getDictionary("zh")} locale="zh" />);
+
+    expect(screen.getByRole("link", { name: "EN" })).toHaveAttribute("href", "/");
+  });
 });

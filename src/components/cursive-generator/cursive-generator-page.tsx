@@ -91,6 +91,10 @@ export function CursiveGeneratorPage({ dictionary, locale }: CursiveGeneratorPag
     }
   }, [selectedStyle]);
 
+  useEffect(() => {
+    loadGoogleFontsForVisibleStyles(visibleStyles);
+  }, [visibleStyles]);
+
   function getPreviewText(textStyle: TextStyle): string {
     if (textStyle.kind === "unicode") {
       return transformUnicodeText(inputText, textStyle);
@@ -291,4 +295,12 @@ function getCharacterCountHintClassName(isOverSuggestedInputCharacterCount: bool
   }
 
   return "mt-2 text-right text-xs font-semibold text-slate-500";
+}
+
+function loadGoogleFontsForVisibleStyles(visibleStyles: TextStyle[]) {
+  visibleStyles.forEach((textStyle) => {
+    if (textStyle.kind === "google-font") {
+      void ensureGoogleFontForStyle(textStyle);
+    }
+  });
 }

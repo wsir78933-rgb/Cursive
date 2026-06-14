@@ -68,6 +68,33 @@ describe("CursiveGeneratorPage", () => {
     });
   });
 
+  it("loads Google fonts for visible style cards", async () => {
+    mockClipboardWriteText(vi.fn());
+
+    render(<CursiveGeneratorPage dictionary={getDictionary("en")} locale="en" />);
+
+    await waitFor(() => {
+      expect(fontLoaderMocks.ensureGoogleFontForStyle).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: "pacifico",
+          kind: "google-font"
+        })
+      );
+    });
+    expect(fontLoaderMocks.ensureGoogleFontForStyle).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "style-script",
+        kind: "google-font"
+      })
+    );
+    expect(fontLoaderMocks.ensureGoogleFontForStyle).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "mistral",
+        kind: "system-font"
+      })
+    );
+  });
+
   it("loads a selected Google font and waits for it before saving PNG output", async () => {
     mockClipboardWriteText(vi.fn());
     let resolveFontLoad: () => void = () => {};

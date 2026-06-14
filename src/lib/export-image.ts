@@ -1,6 +1,5 @@
-import { toPng } from "html-to-image";
-
 export async function saveNodeAsPng(node: HTMLElement, fileName: string): Promise<void> {
+  const { toPng } = await import("html-to-image");
   const dataUrl = await toPng(node, {
     cacheBust: true,
     pixelRatio: 2

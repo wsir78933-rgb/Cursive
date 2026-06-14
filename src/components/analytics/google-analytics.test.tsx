@@ -48,6 +48,7 @@ describe("GoogleAnalytics", () => {
     );
 
     expect(ga4LibraryScript).toBeInTheDocument();
+    expect(ga4LibraryScript).toHaveAttribute("data-strategy", "lazyOnload");
   });
 
   it("configures gtag with the configured measurement id", () => {
@@ -58,6 +59,7 @@ describe("GoogleAnalytics", () => {
     const inlineScript = container.querySelector('[data-script-id="google-analytics"]');
 
     expect(inlineScript?.textContent).toContain(`gtag("config", "${testMeasurementId}")`);
+    expect(inlineScript).toHaveAttribute("data-strategy", "lazyOnload");
   });
 
   it("fails fast when the measurement id environment variable is missing", () => {

@@ -15,6 +15,7 @@ vi.mock("@/lib/export-image", () => exportImageMocks);
 
 import { CursiveGeneratorPage } from "./cursive-generator-page";
 import { getDictionary } from "@/lib/i18n";
+import { filterTextStyles } from "@/lib/text-styles";
 
 function mockClipboardWriteText(writeText: ReturnType<typeof vi.fn>) {
   Object.defineProperty(navigator, "clipboard", {
@@ -68,31 +69,61 @@ describe("CursiveGeneratorPage", () => {
     });
   });
 
-  it("loads Google fonts for visible style cards", async () => {
+  it("loads every Google font for visible style cards", async () => {
     mockClipboardWriteText(vi.fn());
 
     render(<CursiveGeneratorPage dictionary={getDictionary("en")} locale="en" />);
 
+    const expectedGoogleFontIds = filterTextStyles("all")
+      .filter((textStyle) => textStyle.kind === "google-font")
+      .map((textStyle) => textStyle.id);
+    const expectedNonGoogleFontIds = filterTextStyles("all")
+      .filter((textStyle) => textStyle.kind !== "google-font")
+      .map((textStyle) => textStyle.id);
+
+    await waitFor(() => {
+      expect(getLoadedStyleIds()).toEqual(expect.arrayContaining(expectedGoogleFontIds));
+    });
+    expect(getLoadedStyleIds()).not.toEqual(expect.arrayContaining(expectedNonGoogleFontIds));
+  });
+
+  it("loads Google fonts when filters make them visible", async () => {
+    mockClipboardWriteText(vi.fn());
+
+    render(<CursiveGeneratorPage dictionary={getDictionary("en")} locale="en" />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Instagram/TikTok/Youtube" }));
+    fontLoaderMocks.ensureGoogleFontForStyle.mockClear();
+    fireEvent.click(screen.getByRole("button", { name: "Google Docs (Installable)" }));
+
     await waitFor(() => {
       expect(fontLoaderMocks.ensureGoogleFontForStyle).toHaveBeenCalledWith(
         expect.objectContaining({
-          id: "pacifico",
+          id: "dancing-script",
           kind: "google-font"
         })
       );
     });
-    expect(fontLoaderMocks.ensureGoogleFontForStyle).toHaveBeenCalledWith(
-      expect.objectContaining({
-        id: "style-script",
-        kind: "google-font"
-      })
-    );
-    expect(fontLoaderMocks.ensureGoogleFontForStyle).not.toHaveBeenCalledWith(
-      expect.objectContaining({
-        id: "mistral",
-        kind: "system-font"
-      })
-    );
+  });
+
+  it("handles failed visible font preloads without an unhandled rejection", async () => {
+    mockClipboardWriteText(vi.fn());
+    const googleFontPreloadError = new Error("font failed");
+    const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    fontLoaderMocks.ensureGoogleFontForStyle.mockRejectedValueOnce(googleFontPreloadError);
+
+    try {
+      render(<CursiveGeneratorPage dictionary={getDictionary("en")} locale="en" />);
+
+      await waitFor(() => {
+        expect(consoleWarnSpy).toHaveBeenCalledWith(
+          "Failed to preload Google font for visible style dancing-script (Dancing Script).",
+          googleFontPreloadError
+        );
+      });
+    } finally {
+      consoleWarnSpy.mockRestore();
+    }
   });
 
   it("loads a selected Google font and waits for it before saving PNG output", async () => {
@@ -223,3 +254,7 @@ describe("CursiveGeneratorPage", () => {
     expect(previewText.className).toContain("[word-break:break-word]");
   });
 });
+
+function getLoadedStyleIds(): string[] {
+  return fontLoaderMocks.ensureGoogleFontForStyle.mock.calls.map(([textStyle]) => textStyle.id);
+}

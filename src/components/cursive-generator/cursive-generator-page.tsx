@@ -300,7 +300,19 @@ function getCharacterCountHintClassName(isOverSuggestedInputCharacterCount: bool
 function loadGoogleFontsForVisibleStyles(visibleStyles: TextStyle[]) {
   visibleStyles.forEach((textStyle) => {
     if (textStyle.kind === "google-font") {
-      void ensureGoogleFontForStyle(textStyle);
+      void ensureGoogleFontForStyle(textStyle).catch((googleFontPreloadError: unknown) => {
+        reportGoogleFontPreloadFailure(textStyle, googleFontPreloadError);
+      });
     }
   });
+}
+
+function reportGoogleFontPreloadFailure(
+  textStyle: TextStyle,
+  googleFontPreloadError: unknown
+) {
+  console.warn(
+    `Failed to preload Google font for visible style ${textStyle.id} (${textStyle.displayName}).`,
+    googleFontPreloadError
+  );
 }

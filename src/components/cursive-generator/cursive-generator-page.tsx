@@ -1,5 +1,6 @@
 "use client";
 
+import { sendGAEvent } from "@next/third-parties/google";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { FaqSection } from "./faq-section";
@@ -114,6 +115,7 @@ export function CursiveGeneratorPage({ dictionary, locale }: CursiveGeneratorPag
 
     if (clipboardWriteStatus === "copied") {
       showCopyFeedback(dictionary.actions.copied, textStyle.id);
+      trackCopyCursiveTextEvent(textStyle, getCopyPosition(textStyle, visibleStyles));
       return;
     }
 
@@ -315,4 +317,41 @@ function reportGoogleFontPreloadFailure(
     `Failed to preload Google font for visible style ${textStyle.id} (${textStyle.displayName}).`,
     googleFontPreloadError
   );
+}
+
+function getCopyPosition(textStyle: TextStyle, visibleStyles: TextStyle[]): number | undefined {
+  const visibleStyleIndex = visibleStyles.findIndex(
+    (visibleStyle) => visibleStyle.id === textStyle.id
+  );
+
+  if (visibleStyleIndex === -1) {
+    return undefined;
+  }
+
+  return visibleStyleIndex + 1;
+}
+
+function trackCopyCursiveTextEvent(textStyle: TextStyle, copyPosition: number | undefined) {
+  const copyEventParameters: {
+    style_name: string;
+    style_category: string;
+    copy_position?: number;
+  } = {
+    style_name: textStyle.displayName || "unknown",
+    style_category: textStyle.kind || "unknown"
+  };
+
+  if (copyPosition !== undefined) {
+    copyEventParameters.copy_position = copyPosition;
+  }
+
+  try {
+    sendGAEvent("event", "copy_cursive_text", copyEventParameters);
+  } catch (ga4EventError: unknown) {
+    reportCopyCursiveTextEventFailure(ga4EventError);
+  }
+}
+
+function reportCopyCursiveTextEventFailure(ga4EventError: unknown) {
+  console.warn("Failed to send GA4 copy event.", ga4EventError);
 }

@@ -1,24 +1,14 @@
 import { render } from "@testing-library/react";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("next/script", () => ({
-  default: ({
-    children,
-    id,
-    src,
-    strategy
-  }: {
-    children?: React.ReactNode;
-    id?: string;
-    src?: string;
-    strategy?: string;
-  }) => (
-    <div data-script-id={id} data-src={src} data-strategy={strategy}>
-      {children}
-    </div>
-  )
+const nextGoogleAnalyticsMocks = vi.hoisted(() => ({
+  GoogleAnalytics: vi.fn()
+}));
+
+vi.mock("@next/third-parties/google", () => ({
+  GoogleAnalytics: nextGoogleAnalyticsMocks.GoogleAnalytics
 }));
 
 import {
@@ -34,32 +24,26 @@ const googleAnalyticsSource = readFileSync(
 );
 
 describe("GoogleAnalytics", () => {
+  beforeEach(() => {
+    nextGoogleAnalyticsMocks.GoogleAnalytics.mockReset();
+    nextGoogleAnalyticsMocks.GoogleAnalytics.mockImplementation(({ gaId }: { gaId: string }) => (
+      <div data-ga-id={gaId} data-testid="next-google-analytics" />
+    ));
+  });
+
   afterEach(() => {
     delete process.env[googleAnalyticsMeasurementIdEnvName];
   });
 
-  it("loads the GA4 library for the configured measurement id", () => {
+  it("initializes GA4 through the official Next.js third-parties component", () => {
     process.env[googleAnalyticsMeasurementIdEnvName] = testMeasurementId;
 
-    const { container } = render(<GoogleAnalytics />);
+    render(<GoogleAnalytics />);
 
-    const ga4LibraryScript = container.querySelector(
-      `[data-src="https://www.googletagmanager.com/gtag/js?id=${testMeasurementId}"]`
+    expect(nextGoogleAnalyticsMocks.GoogleAnalytics).toHaveBeenCalledWith(
+      { gaId: testMeasurementId },
+      undefined
     );
-
-    expect(ga4LibraryScript).toBeInTheDocument();
-    expect(ga4LibraryScript).toHaveAttribute("data-strategy", "lazyOnload");
-  });
-
-  it("configures gtag with the configured measurement id", () => {
-    process.env[googleAnalyticsMeasurementIdEnvName] = testMeasurementId;
-
-    const { container } = render(<GoogleAnalytics />);
-
-    const inlineScript = container.querySelector('[data-script-id="google-analytics"]');
-
-    expect(inlineScript?.textContent).toContain(`gtag("config", "${testMeasurementId}")`);
-    expect(inlineScript).toHaveAttribute("data-strategy", "lazyOnload");
   });
 
   it("fails fast when the measurement id environment variable is missing", () => {

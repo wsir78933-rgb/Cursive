@@ -1,4 +1,4 @@
-import Script from "next/script";
+import { GoogleAnalytics as NextGoogleAnalytics } from "@next/third-parties/google";
 
 export const googleAnalyticsMeasurementIdEnvName = "NEXT_PUBLIC_GA_MEASUREMENT_ID";
 
@@ -23,20 +23,5 @@ export function getGoogleAnalyticsMeasurementId(): string {
 export function GoogleAnalytics() {
   const measurementId = getGoogleAnalyticsMeasurementId();
 
-  return (
-    <>
-      <Script
-        src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`}
-        strategy="lazyOnload"
-      />
-      <Script id="google-analytics" strategy="lazyOnload">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){window.dataLayer.push(arguments);}
-          gtag("js", new Date());
-          gtag("config", "${measurementId}");
-        `}
-      </Script>
-    </>
-  );
+  return <NextGoogleAnalytics gaId={measurementId} />;
 }

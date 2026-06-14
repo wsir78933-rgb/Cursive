@@ -10,8 +10,13 @@ const exportImageMocks = vi.hoisted(() => ({
   saveNodeAsPng: vi.fn(() => Promise.resolve())
 }));
 
+const googleAnalyticsEventMocks = vi.hoisted(() => ({
+  sendGAEvent: vi.fn()
+}));
+
 vi.mock("@/lib/google-font-loader", () => fontLoaderMocks);
 vi.mock("@/lib/export-image", () => exportImageMocks);
+vi.mock("@next/third-parties/google", () => googleAnalyticsEventMocks);
 
 import { CursiveGeneratorPage } from "./cursive-generator-page";
 import { getDictionary } from "@/lib/i18n";
@@ -30,6 +35,7 @@ describe("CursiveGeneratorPage", () => {
     fontLoaderMocks.ensureGoogleFontForStyle.mockResolvedValue(undefined);
     exportImageMocks.saveNodeAsPng.mockReset();
     exportImageMocks.saveNodeAsPng.mockResolvedValue(undefined);
+    googleAnalyticsEventMocks.sendGAEvent.mockReset();
   });
 
   it("shows clear feedback when clipboard copy fails", async () => {
@@ -42,6 +48,83 @@ describe("CursiveGeneratorPage", () => {
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Copy failed" })).toBeInTheDocument();
     });
+    expect(googleAnalyticsEventMocks.sendGAEvent).not.toHaveBeenCalled();
+  });
+
+  it("sends a GA4 event after a successful main copy", async () => {
+    mockClipboardWriteText(vi.fn().mockResolvedValue(undefined));
+
+    render(<CursiveGeneratorPage dictionary={getDictionary("en")} locale="en" />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Copy" }));
+
+    await waitFor(() => {
+      expect(googleAnalyticsEventMocks.sendGAEvent).toHaveBeenCalledWith(
+        "event",
+        "copy_cursive_text",
+        {
+          copy_position: 1,
+          style_category: "unicode",
+          style_name: "Unicode Script"
+        }
+      );
+    });
+  });
+
+  it("sends a GA4 event after a successful copy without user text", async () => {
+    const clipboardWriteText = vi.fn().mockResolvedValue(undefined);
+    const privateInputText = "private@example.com";
+    mockClipboardWriteText(clipboardWriteText);
+
+    render(<CursiveGeneratorPage dictionary={getDictionary("en")} locale="en" />);
+
+    fireEvent.change(screen.getByLabelText("Your text"), {
+      target: { value: privateInputText }
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Copy this style: Unicode Bold" }));
+
+    await waitFor(() => {
+      expect(googleAnalyticsEventMocks.sendGAEvent).toHaveBeenCalledWith(
+        "event",
+        "copy_cursive_text",
+        {
+          copy_position: 2,
+          style_category: "unicode",
+          style_name: "Unicode Bold"
+        }
+      );
+    });
+
+    const analyticsEventParameters = googleAnalyticsEventMocks.sendGAEvent.mock.calls[0]?.[2];
+    expect(JSON.stringify(analyticsEventParameters)).not.toContain(privateInputText);
+    expect(Object.keys(analyticsEventParameters)).not.toEqual(
+      expect.arrayContaining(["text", "input_text", "user_text", "email"])
+    );
+  });
+
+  it("keeps copied feedback when GA4 event reporting fails", async () => {
+    const ga4EventError = new Error("GA down");
+    const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    googleAnalyticsEventMocks.sendGAEvent.mockImplementation(() => {
+      throw ga4EventError;
+    });
+    mockClipboardWriteText(vi.fn().mockResolvedValue(undefined));
+
+    try {
+      render(<CursiveGeneratorPage dictionary={getDictionary("en")} locale="en" />);
+
+      fireEvent.click(screen.getByRole("button", { name: "Copy" }));
+
+      await waitFor(() => {
+        expect(screen.getByRole("button", { name: "Copied" })).toBeInTheDocument();
+      });
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        "Failed to send GA4 copy event.",
+        ga4EventError
+      );
+    } finally {
+      consoleWarnSpy.mockRestore();
+    }
   });
 
   it("uses one full accessible name for each filter button", () => {

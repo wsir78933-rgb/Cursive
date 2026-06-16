@@ -170,15 +170,6 @@ export const textStyles: TextStyle[] = [
     sourceBadges: []
   },
   {
-    id: "lucida-handwriting",
-    displayName: "Lucida Handwriting",
-    kind: "system-font",
-    fontFamily: "'Lucida Handwriting', cursive",
-    sampleText: "Abc",
-    filters: ["all"],
-    sourceBadges: []
-  },
-  {
     id: "brush-script-mt",
     displayName: "Brush Script MT",
     kind: "system-font",
@@ -186,15 +177,6 @@ export const textStyles: TextStyle[] = [
     sampleText: "Abc",
     filters: msWordFilters,
     sourceBadges: ["W"]
-  },
-  {
-    id: "segoe-script",
-    displayName: "Segoe Script",
-    kind: "system-font",
-    fontFamily: "'Segoe Script', cursive",
-    sampleText: "Abc",
-    filters: ["all"],
-    sourceBadges: []
   },
   {
     id: "pacifico",
@@ -269,7 +251,25 @@ export const textStyles: TextStyle[] = [
     sampleText: "Abc",
     filters: googleDefaultFilters,
     sourceBadges: ["G"]
-  }))
+  })),
+  {
+    id: "lucida-handwriting",
+    displayName: "Lucida Handwriting",
+    kind: "system-font",
+    fontFamily: "'Lucida Handwriting', cursive",
+    sampleText: "Abc",
+    filters: ["all"],
+    sourceBadges: []
+  },
+  {
+    id: "segoe-script",
+    displayName: "Segoe Script",
+    kind: "system-font",
+    fontFamily: "'Segoe Script', cursive",
+    sampleText: "Abc",
+    filters: ["all"],
+    sourceBadges: []
+  }
 ];
 
 export function filterTextStyles(filter: StyleFilter): TextStyle[] {

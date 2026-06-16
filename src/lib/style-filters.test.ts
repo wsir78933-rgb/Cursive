@@ -7,6 +7,12 @@ describe("filterTextStyles", () => {
     expect(filterTextStyles("all")).toHaveLength(textStyles.length);
   });
 
+  it("places plain system font previews at the end of the All filter", () => {
+    const allStyleIds = filterTextStyles("all").map((style) => style.id);
+
+    expect(allStyleIds.slice(-2)).toEqual(["lucida-handwriting", "segoe-script"]);
+  });
+
   it("includes Unicode styles in the social platform filter", () => {
     const socialStyleIds = filterTextStyles("social").map((style) => style.id);
 

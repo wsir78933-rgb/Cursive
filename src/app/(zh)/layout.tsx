@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { GoogleAnalytics } from "@/components/analytics/google-analytics";
+import { MicrosoftClarity } from "@/components/analytics/microsoft-clarity";
 import "../globals.css";
 
 type ChineseRootLayoutProps = {
@@ -13,6 +14,7 @@ export default function ChineseRootLayout({ children }: ChineseRootLayoutProps) 
       <body>
         {children}
         <GoogleAnalytics />
+        <MicrosoftClarity />
       </body>
     </html>
   );

@@ -2,6 +2,7 @@ import React from "react";
 import { describe, expect, it } from "vitest";
 
 import { GoogleAnalytics } from "@/components/analytics/google-analytics";
+import { MicrosoftClarity } from "@/components/analytics/microsoft-clarity";
 import EnglishRootLayout from "./(en)/layout";
 import ChineseRootLayout from "./(zh)/layout";
 
@@ -24,12 +25,14 @@ describe("route group root layouts", () => {
     expect(layoutElement.props.suppressHydrationWarning).toBe(true);
   });
 
-  it("loads Google Analytics in both root layouts", () => {
+  it("loads analytics scripts in both root layouts", () => {
     const englishLayoutElement = EnglishRootLayout({ children: <main /> });
     const chineseLayoutElement = ChineseRootLayout({ children: <main /> });
 
     expect(getBodyChildTypes(englishLayoutElement)).toContain(GoogleAnalytics);
     expect(getBodyChildTypes(chineseLayoutElement)).toContain(GoogleAnalytics);
+    expect(getBodyChildTypes(englishLayoutElement)).toContain(MicrosoftClarity);
+    expect(getBodyChildTypes(chineseLayoutElement)).toContain(MicrosoftClarity);
   });
 });
 

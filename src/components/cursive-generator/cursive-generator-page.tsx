@@ -1,7 +1,7 @@
 "use client";
 
 import { sendGAEvent } from "@next/third-parties/google";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 
 import { FaqSection } from "./faq-section";
 import { FontGrid } from "./font-grid";
@@ -62,14 +62,38 @@ export function CursiveGeneratorPage({ dictionary, locale }: CursiveGeneratorPag
   const [copyLabel, setCopyLabel] = useState(dictionary.actions.copy);
   const [copiedStyleId, setCopiedStyleId] = useState<string | null>(null);
   const exportNodeRef = useRef<HTMLDivElement>(null);
+  const inputTextRef = useRef(inputText);
   const copyFeedbackTimeoutRef = useRef<number | null>(null);
+  inputTextRef.current = inputText;
+  const deferredInputText = useDeferredValue(inputText);
 
   const visibleStyles = useMemo(() => filterTextStyles(selectedFilter), [selectedFilter]);
 
-  const selectedStyle =
-    textStyles.find((textStyle) => textStyle.id === selectedStyleId) ?? textStyles[0];
+  const selectedStyle = useMemo(
+    () => textStyles.find((textStyle) => textStyle.id === selectedStyleId) ?? textStyles[0],
+    [selectedStyleId]
+  );
 
-  const selectedPreviewText = getPreviewText(selectedStyle);
+  const selectedPreviewText = useMemo(
+    () => getPreviewTextForInput(inputText, selectedStyle),
+    [inputText, selectedStyle]
+  );
+  const fontGridPreviewTextByStyleId = useMemo(
+    () => getPreviewTextByStyleId(visibleStyles, deferredInputText),
+    [deferredInputText, visibleStyles]
+  );
+  const getFontGridPreviewText = useCallback(
+    (textStyle: TextStyle) => {
+      const previewText = fontGridPreviewTextByStyleId.get(textStyle.id);
+
+      if (previewText === undefined) {
+        throw new Error(`Missing font grid preview text for style ${textStyle.id}`);
+      }
+
+      return previewText;
+    },
+    [fontGridPreviewTextByStyleId]
+  );
   const inputCharacterCount = Array.from(inputText).length;
   const isOverSuggestedInputCharacterCount =
     inputCharacterCount > suggestedInputCharacterCount;
@@ -96,76 +120,78 @@ export function CursiveGeneratorPage({ dictionary, locale }: CursiveGeneratorPag
     loadGoogleFontsForVisibleStyles(visibleStyles);
   }, [visibleStyles]);
 
-  function getPreviewText(textStyle: TextStyle): string {
-    if (textStyle.kind === "unicode") {
-      return transformUnicodeText(inputText, textStyle);
-    }
-
-    return inputText;
-  }
-
-  function handleStyleSelect(textStyle: TextStyle) {
+  const handleStyleSelect = useCallback((textStyle: TextStyle) => {
     setSelectedStyleId(textStyle.id);
-  }
+  }, []);
 
-  async function copyStyleToClipboard(textStyle: TextStyle) {
-    const copyText = getCopyText(inputText, textStyle);
-    setSelectedStyleId(textStyle.id);
-    const clipboardWriteStatus = await writeClipboardText(copyText);
+  const showCopyFeedback = useCallback(
+    (nextCopyLabel: string, nextCopiedStyleId: string | null) => {
+      if (copyFeedbackTimeoutRef.current) {
+        window.clearTimeout(copyFeedbackTimeoutRef.current);
+      }
 
-    if (clipboardWriteStatus === "copied") {
-      showCopyFeedback(dictionary.actions.copied, textStyle.id);
-      trackCopyCursiveTextEvent(textStyle, getCopyPosition(textStyle, visibleStyles));
-      return;
-    }
+      setCopiedStyleId(nextCopiedStyleId);
+      setCopyLabel(nextCopyLabel);
 
-    showCopyFeedback(dictionary.actions.copyFailed, null);
-  }
+      copyFeedbackTimeoutRef.current = window.setTimeout(() => {
+        setCopyLabel(dictionary.actions.copy);
+        setCopiedStyleId(null);
+      }, 1300);
+    },
+    [dictionary.actions.copy]
+  );
 
-  function previewStyle(textStyle: TextStyle) {
+  const copyStyleToClipboard = useCallback(
+    async (textStyle: TextStyle) => {
+      const copyText = getCopyText(inputTextRef.current, textStyle);
+      setSelectedStyleId(textStyle.id);
+      const clipboardWriteStatus = await writeClipboardText(copyText);
+
+      if (clipboardWriteStatus === "copied") {
+        showCopyFeedback(dictionary.actions.copied, textStyle.id);
+        trackCopyCursiveTextEvent(textStyle, getCopyPosition(textStyle, visibleStyles));
+        return;
+      }
+
+      showCopyFeedback(dictionary.actions.copyFailed, null);
+    },
+    [dictionary.actions.copied, dictionary.actions.copyFailed, showCopyFeedback, visibleStyles]
+  );
+
+  const previewStyle = useCallback((textStyle: TextStyle) => {
     setSelectedStyleId(textStyle.id);
     setIsPreviewOpen(true);
-  }
+  }, []);
 
-  function showCopyFeedback(nextCopyLabel: string, nextCopiedStyleId: string | null) {
-    if (copyFeedbackTimeoutRef.current) {
-      window.clearTimeout(copyFeedbackTimeoutRef.current);
-    }
+  const openPreview = useCallback(() => {
+    setIsPreviewOpen(true);
+  }, []);
 
-    setCopiedStyleId(nextCopiedStyleId);
-    setCopyLabel(nextCopyLabel);
-
-    copyFeedbackTimeoutRef.current = window.setTimeout(() => {
-      setCopyLabel(dictionary.actions.copy);
-      setCopiedStyleId(null);
-    }, 1300);
-  }
-
-  async function handleCopy() {
+  const handleCopy = useCallback(async () => {
     await copyStyleToClipboard(selectedStyle);
-  }
+  }, [copyStyleToClipboard, selectedStyle]);
 
-  async function handleSave() {
+  const handleSave = useCallback(async () => {
     if (!exportNodeRef.current) {
       throw new Error("PNG export target is missing");
     }
 
     await ensureGoogleFontForStyle(selectedStyle);
     await saveNodeAsPng(exportNodeRef.current, `cursive-generator-${selectedStyle.id}.png`);
-  }
+  }, [selectedStyle]);
 
-  function handleClear() {
+  const handleClear = useCallback(() => {
     setInputText("");
-  }
+  }, []);
 
-  function handleFilterChange(nextFilter: StyleFilter) {
+  const handleFilterChange = useCallback((nextFilter: StyleFilter) => {
     const nextStyles = filterTextStyles(nextFilter);
     setSelectedFilter(nextFilter);
 
     if (!nextStyles.some((textStyle) => textStyle.id === selectedStyleId)) {
       setSelectedStyleId(nextStyles[0]?.id ?? "unicode-script");
     }
-  }
+  }, [selectedStyleId]);
 
   return (
     <main className="min-h-screen">
@@ -206,7 +232,7 @@ export function CursiveGeneratorPage({ dictionary, locale }: CursiveGeneratorPag
             dictionary={dictionary}
             fontSize={fontSize}
             onCopy={handleCopy}
-            onPreview={() => setIsPreviewOpen(true)}
+            onPreview={openPreview}
             onSave={handleSave}
             previewText={selectedPreviewText}
             selectedStyle={selectedStyle}
@@ -240,7 +266,7 @@ export function CursiveGeneratorPage({ dictionary, locale }: CursiveGeneratorPag
         onCopyStyle={copyStyleToClipboard}
         onPreviewStyle={previewStyle}
         onSelectStyle={handleStyleSelect}
-        previewTextByStyleId={getPreviewText}
+        previewTextByStyleId={getFontGridPreviewText}
         selectedStyle={selectedStyle}
         styles={visibleStyles}
       />
@@ -297,6 +323,26 @@ function getCharacterCountHintClassName(isOverSuggestedInputCharacterCount: bool
   }
 
   return "mt-2 text-right text-xs font-semibold text-slate-500";
+}
+
+function getPreviewTextByStyleId(
+  visibleStyles: TextStyle[],
+  previewInputText: string
+): Map<string, string> {
+  return new Map(
+    visibleStyles.map((textStyle) => [
+      textStyle.id,
+      getPreviewTextForInput(previewInputText, textStyle)
+    ])
+  );
+}
+
+function getPreviewTextForInput(previewInputText: string, textStyle: TextStyle): string {
+  if (textStyle.kind === "unicode") {
+    return transformUnicodeText(previewInputText, textStyle);
+  }
+
+  return previewInputText;
 }
 
 function loadGoogleFontsForVisibleStyles(visibleStyles: TextStyle[]) {

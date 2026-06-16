@@ -259,6 +259,7 @@ describe("CursiveGeneratorPage", () => {
     const textInput = screen.getByLabelText("Your text");
 
     expect(textInput.tagName).toBe("TEXTAREA");
+    expect(textInput).toHaveClass("resize-y");
     expect(screen.getByText("11 / Suggested 60 characters or fewer")).toHaveClass("text-slate-500");
 
     fireEvent.change(textInput, {

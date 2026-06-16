@@ -1,5 +1,7 @@
 "use client";
 
+import { memo } from "react";
+
 import type { getDictionary } from "@/lib/i18n";
 import type { StyleFilter } from "@/lib/text-styles";
 import { cn } from "@/lib/utils";
@@ -23,7 +25,7 @@ type StyleFilterTabsProps = {
   onFilterChange: (value: StyleFilter) => void;
 };
 
-export function StyleFilterTabs({
+export const StyleFilterTabs = memo(function StyleFilterTabs({
   dictionary,
   selectedFilter,
   filterOptions,
@@ -62,4 +64,5 @@ export function StyleFilterTabs({
       </div>
     </section>
   );
-}
+});
+StyleFilterTabs.displayName = "StyleFilterTabs";

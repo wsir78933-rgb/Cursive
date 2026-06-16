@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { Check, Copy, Eye } from "lucide-react";
 
 import { SourceBadgeIcons } from "./source-badge-icons";
@@ -21,7 +22,7 @@ type FontCardProps = {
   onSelect: (textStyle: TextStyle) => void;
 };
 
-export function FontCard({
+export const FontCard = memo(function FontCard({
   textStyle,
   isSelected,
   isCopied,
@@ -91,7 +92,8 @@ export function FontCard({
       </button>
     </article>
   );
-}
+});
+FontCard.displayName = "FontCard";
 
 function getSampleFontSize(previewText: string): string {
   const characterCount = Array.from(previewText).length;

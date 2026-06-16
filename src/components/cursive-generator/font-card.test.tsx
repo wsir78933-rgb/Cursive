@@ -6,9 +6,20 @@ import { FontCard } from "./font-card";
 import { getDictionary } from "@/lib/i18n";
 import { textStyles } from "@/lib/text-styles";
 
+function findTextStyleById(styleId: string) {
+  const textStyle = textStyles.find((style) => style.id === styleId);
+
+  if (!textStyle) {
+    throw new Error(`Text style not found: ${styleId}`);
+  }
+
+  return textStyle;
+}
+
 describe("FontCard", () => {
   it("clips long preview samples inside the card", () => {
     const longPreviewText = "abcdefghijklmnopqrstuvwxyz";
+    const unicodeScriptStyle = findTextStyleById("unicode-script");
 
     render(
       <FontCard
@@ -19,7 +30,7 @@ describe("FontCard", () => {
         onPreview={vi.fn()}
         onSelect={vi.fn()}
         previewText={longPreviewText}
-        textStyle={textStyles[0]}
+        textStyle={unicodeScriptStyle}
       />
     );
 
@@ -29,6 +40,7 @@ describe("FontCard", () => {
 
   it("keeps the style name accessible without rendering it as card text", () => {
     const onSelect = vi.fn();
+    const unicodeScriptStyle = findTextStyleById("unicode-script");
 
     render(
       <FontCard
@@ -39,7 +51,7 @@ describe("FontCard", () => {
         onPreview={vi.fn()}
         onSelect={onSelect}
         previewText="hello world"
-        textStyle={textStyles[0]}
+        textStyle={unicodeScriptStyle}
       />
     );
 
@@ -51,10 +63,12 @@ describe("FontCard", () => {
 
     fireEvent.click(selectButton);
 
-    expect(onSelect).toHaveBeenCalledWith(textStyles[0]);
+    expect(onSelect).toHaveBeenCalledWith(unicodeScriptStyle);
   });
 
   it("does not show extra copyable status inside copyable cards", () => {
+    const unicodeScriptStyle = findTextStyleById("unicode-script");
+
     render(
       <FontCard
         dictionary={getDictionary("en")}
@@ -64,7 +78,7 @@ describe("FontCard", () => {
         onPreview={vi.fn()}
         onSelect={vi.fn()}
         previewText="hello world"
-        textStyle={textStyles[0]}
+        textStyle={unicodeScriptStyle}
       />
     );
 
@@ -73,6 +87,8 @@ describe("FontCard", () => {
   });
 
   it("does not show extra preview-only status inside preview-only cards", () => {
+    const dancingScriptStyle = findTextStyleById("dancing-script");
+
     render(
       <FontCard
         dictionary={getDictionary("en")}
@@ -82,7 +98,7 @@ describe("FontCard", () => {
         onPreview={vi.fn()}
         onSelect={vi.fn()}
         previewText="hello world"
-        textStyle={textStyles[2]}
+        textStyle={dancingScriptStyle}
       />
     );
 
@@ -91,6 +107,7 @@ describe("FontCard", () => {
 
   it("uses preview action for preview-only font cards", () => {
     const onPreview = vi.fn();
+    const dancingScriptStyle = findTextStyleById("dancing-script");
 
     render(
       <FontCard
@@ -101,7 +118,7 @@ describe("FontCard", () => {
         onPreview={onPreview}
         onSelect={vi.fn()}
         previewText="hello world"
-        textStyle={textStyles[2]}
+        textStyle={dancingScriptStyle}
       />
     );
 
@@ -110,10 +127,12 @@ describe("FontCard", () => {
     expect(
       screen.queryByRole("button", { name: "Copy this style: Dancing Script" })
     ).not.toBeInTheDocument();
-    expect(onPreview).toHaveBeenCalledWith(textStyles[2]);
+    expect(onPreview).toHaveBeenCalledWith(dancingScriptStyle);
   });
 
   it("shows recommended platform icons for unicode cards", () => {
+    const unicodeScriptStyle = findTextStyleById("unicode-script");
+
     render(
       <FontCard
         dictionary={getDictionary("en")}
@@ -123,7 +142,7 @@ describe("FontCard", () => {
         onPreview={vi.fn()}
         onSelect={vi.fn()}
         previewText="hello world"
-        textStyle={textStyles[0]}
+        textStyle={unicodeScriptStyle}
       />
     );
 
@@ -136,6 +155,8 @@ describe("FontCard", () => {
   });
 
   it("shows the recommended platform icon for Google cards", () => {
+    const pacificoStyle = findTextStyleById("pacifico");
+
     render(
       <FontCard
         dictionary={getDictionary("en")}
@@ -145,7 +166,7 @@ describe("FontCard", () => {
         onPreview={vi.fn()}
         onSelect={vi.fn()}
         previewText="hello world"
-        textStyle={textStyles[6]}
+        textStyle={pacificoStyle}
       />
     );
 
@@ -154,6 +175,8 @@ describe("FontCard", () => {
   });
 
   it("shows the recommended platform icon for Word cards", () => {
+    const brushScriptStyle = findTextStyleById("brush-script-mt");
+
     render(
       <FontCard
         dictionary={getDictionary("en")}
@@ -163,7 +186,7 @@ describe("FontCard", () => {
         onPreview={vi.fn()}
         onSelect={vi.fn()}
         previewText="hello world"
-        textStyle={textStyles[4]}
+        textStyle={brushScriptStyle}
       />
     );
 
@@ -172,6 +195,8 @@ describe("FontCard", () => {
   });
 
   it("uses a darker selected surface with white selected content", () => {
+    const pacificoStyle = findTextStyleById("pacifico");
+
     render(
       <FontCard
         dictionary={getDictionary("en")}
@@ -181,11 +206,11 @@ describe("FontCard", () => {
         onPreview={vi.fn()}
         onSelect={vi.fn()}
         previewText="hello world"
-        textStyle={textStyles[6]}
+        textStyle={pacificoStyle}
       />
     );
 
-    const selectButton = screen.getByRole("button", { name: textStyles[6].displayName });
+    const selectButton = screen.getByRole("button", { name: pacificoStyle.displayName });
     const selectedCard = selectButton.closest("article");
     const selectedSourceIcon = screen.getByRole("img", { name: "Recommended platforms: Google" });
 
@@ -194,6 +219,6 @@ describe("FontCard", () => {
     expect(selectButton).toHaveAttribute("aria-pressed", "true");
     expect(selectedSourceIcon).toHaveClass("text-white");
     expect(screen.getByText("hello world")).toHaveClass("text-white");
-    expect(screen.queryByText(textStyles[6].displayName)).not.toBeInTheDocument();
+    expect(screen.queryByText(pacificoStyle.displayName)).not.toBeInTheDocument();
   });
 });

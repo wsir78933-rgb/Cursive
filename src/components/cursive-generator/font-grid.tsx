@@ -1,5 +1,7 @@
 "use client";
 
+import { memo } from "react";
+
 import { FontCard } from "./font-card";
 import type { getDictionary } from "@/lib/i18n";
 import type { TextStyle } from "@/lib/text-styles";
@@ -17,7 +19,7 @@ type FontGridProps = {
   onSelectStyle: (textStyle: TextStyle) => void;
 };
 
-export function FontGrid({
+export const FontGrid = memo(function FontGrid({
   styles,
   selectedStyle,
   copiedStyleId,
@@ -44,4 +46,5 @@ export function FontGrid({
       ))}
     </section>
   );
-}
+});
+FontGrid.displayName = "FontGrid";

@@ -15,5 +15,7 @@ describe("Textarea", () => {
     expect(textarea.tagName).toBe("TEXTAREA");
     expect(textarea).toHaveClass("min-h-32");
     expect(textarea).toHaveClass("text-lg");
+    expect(textarea).toHaveClass("transition-colors");
+    expect(textarea).not.toHaveClass("transition-all");
   });
 });

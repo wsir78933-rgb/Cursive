@@ -1,6 +1,6 @@
 "use client";
 
-import type { ChangeEvent } from "react";
+import { memo, type ChangeEvent } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -22,7 +22,7 @@ type GeneratorToolbarProps = {
 
 const presetColors = ["#1c2430", "#0a8f7c", "#3b6f98", "#c86a76"];
 
-export function GeneratorToolbar({
+export const GeneratorToolbar = memo(function GeneratorToolbar({
   dictionary,
   textColor,
   fontSize,
@@ -108,4 +108,5 @@ export function GeneratorToolbar({
       </div>
     </aside>
   );
-}
+});
+GeneratorToolbar.displayName = "GeneratorToolbar";

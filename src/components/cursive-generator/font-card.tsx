@@ -42,8 +42,9 @@ export const FontCard = memo(function FontCard({
   return (
     <article
       className={cn(
-        "group relative min-h-[138px] min-w-0 overflow-hidden rounded-[1.35rem] border border-slate-200 bg-white/90 text-ink shadow-sm transition-all hover:-translate-y-1 hover:border-slate-300 hover:shadow-lg",
-        isSelected && "border-[#087565] bg-[#087565] text-white shadow-md ring-2 ring-[#087565]/20"
+        "font-card-animated-border group relative isolate min-h-[138px] min-w-0 overflow-hidden rounded-[1.35rem] border border-slate-200 bg-white/90 text-ink shadow-sm transition duration-150 ease-out hover:-translate-y-1 hover:border-slate-300 hover:shadow-lg motion-reduce:transition-none motion-reduce:hover:translate-y-0",
+        isSelected &&
+          "selected-font-card-border border-[#087565] shadow-md ring-2 ring-[#087565]/20"
       )}
     >
       <button
@@ -55,10 +56,7 @@ export const FontCard = memo(function FontCard({
       >
         <SourceBadgeIcons badges={textStyle.sourceBadges} isSelected={isSelected} />
         <div
-          className={cn(
-            "flex min-h-12 max-w-full items-center overflow-hidden text-ellipsis whitespace-nowrap leading-none text-ink",
-            isSelected && "text-white"
-          )}
+          className="flex min-h-12 max-w-full items-center overflow-hidden text-ellipsis whitespace-nowrap leading-none text-ink"
           style={{ fontFamily: textStyle.fontFamily, fontSize: sampleFontSize }}
           title={previewText}
         >
@@ -68,7 +66,7 @@ export const FontCard = memo(function FontCard({
       <button
         aria-label={actionLabel}
         className={cn(
-          "absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:-translate-y-0.5 hover:text-ink hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent",
+          "absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition duration-150 ease-out hover:-translate-y-0.5 hover:text-ink hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none motion-reduce:hover:translate-y-0",
           copyMode === "copyable" && isCopied && "border-accent bg-accent text-white"
         )}
         onClick={(event) => {

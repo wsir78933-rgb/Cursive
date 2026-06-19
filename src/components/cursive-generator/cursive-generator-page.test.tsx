@@ -230,9 +230,6 @@ describe("CursiveGeneratorPage", () => {
       );
     });
     expect(screen.getByLabelText("Your text").style.fontFamily).toContain("Dancing Script");
-    expect(screen.getByTestId("main-style-preview-output").style.fontFamily).toContain(
-      "Dancing Script"
-    );
     expect(screen.getByTestId("png-export-output").style.fontFamily).toContain(
       "Dancing Script"
     );
@@ -260,22 +257,110 @@ describe("CursiveGeneratorPage", () => {
 
     expect(textInput.tagName).toBe("TEXTAREA");
     expect(textInput).toHaveClass("resize-y");
-    expect(screen.getByText("11 / Suggested 60 characters or fewer")).toHaveClass("text-slate-500");
+    expect(screen.getByText("11 / 60")).toHaveClass("text-slate-500");
 
     fireEvent.change(textInput, {
       target: { value: "a".repeat(61) }
     });
 
     expect(textInput).toHaveValue("a".repeat(61));
-    expect(screen.getByText("61 / Suggested 60 characters or fewer")).toHaveClass("text-amber-700");
+    expect(screen.getByText("61 / 60")).toHaveClass("text-amber-700");
   });
 
-  it("uses localized Chinese suggested character count text", () => {
+  it("uses a non-interactive decorative border on the homepage input container", () => {
+    mockClipboardWriteText(vi.fn());
+
+    render(<CursiveGeneratorPage dictionary={getDictionary("en")} locale="en" />);
+
+    const textInput = screen.getByLabelText("Your text");
+    expect(textInput).toHaveClass("resize-y");
+
+    const inputContainer = screen.getByTestId("homepage-input-container");
+    const decorativeBorder = within(inputContainer).getByTestId(
+      "homepage-input-decorative-border"
+    );
+
+    expect(inputContainer).toHaveClass("rounded-[2rem]");
+    expect(inputContainer).toHaveClass("shadow-sm");
+    expect(decorativeBorder).toHaveAttribute("aria-hidden", "true");
+    expect(decorativeBorder).toHaveClass("pointer-events-none");
+    expect(decorativeBorder).toHaveClass("absolute");
+    expect(decorativeBorder).toHaveClass("inset-0");
+    expect(decorativeBorder).toHaveClass("rounded-[2rem]");
+    expect(decorativeBorder).toHaveClass("border");
+    expect(decorativeBorder).toHaveClass("border-accent/50");
+  });
+
+  it("uses compact suggested character count text for Chinese locale", () => {
     mockClipboardWriteText(vi.fn());
 
     render(<CursiveGeneratorPage dictionary={getDictionary("zh")} locale="zh" />);
 
-    expect(screen.getByText("11 / 建议 60 字以内")).toBeInTheDocument();
+    expect(screen.getByText("11 / 60")).toBeInTheDocument();
+  });
+
+  it("moves main actions under the input and removes the hero preview card", () => {
+    mockClipboardWriteText(vi.fn());
+
+    render(<CursiveGeneratorPage dictionary={getDictionary("en")} locale="en" />);
+
+    const previewButton = screen.getByRole("button", { name: "Preview" });
+
+    expect(screen.getByRole("button", { name: "Copy" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Save" })).toBeInTheDocument();
+    expect(previewButton).toHaveClass("hidden");
+    expect(previewButton).toHaveClass("sm:inline-flex");
+    expect(screen.queryByTestId("main-style-preview-output")).not.toBeInTheDocument();
+    expect(screen.queryByText("Selected style")).not.toBeInTheDocument();
+  });
+
+  it("adds animated borders to the hero action buttons", () => {
+    mockClipboardWriteText(vi.fn());
+
+    render(<CursiveGeneratorPage dictionary={getDictionary("en")} locale="en" />);
+
+    expect(
+      within(screen.getByRole("button", { name: "Copy" })).getByTestId(
+        "animated-button-border"
+      )
+    ).toBeInTheDocument();
+    expect(
+      within(screen.getByRole("button", { name: "Save" })).getByTestId(
+        "animated-button-border"
+      )
+    ).toBeInTheDocument();
+    expect(
+      within(screen.getByRole("button", { name: "Preview" })).getByTestId(
+        "animated-button-border"
+      )
+    ).toBeInTheDocument();
+    expect(screen.getAllByTestId("animated-button-border")).toHaveLength(4);
+  });
+
+  it("does not add animated borders to preview dialog actions", async () => {
+    mockClipboardWriteText(vi.fn());
+
+    render(<CursiveGeneratorPage dictionary={getDictionary("en")} locale="en" />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Preview" }));
+
+    const dialog = await screen.findByRole("dialog");
+
+    expect(within(dialog).getByRole("button", { name: "Copy" })).toBeInTheDocument();
+    expect(within(dialog).getByRole("button", { name: "Save" })).toBeInTheDocument();
+    expect(within(dialog).queryByTestId("animated-button-border")).not.toBeInTheDocument();
+  });
+
+  it("keeps text settings in the hero right column on desktop", () => {
+    mockClipboardWriteText(vi.fn());
+
+    render(<CursiveGeneratorPage dictionary={getDictionary("en")} locale="en" />);
+
+    const textSettingsHeading = screen.getByRole("heading", { name: "Text settings" });
+    const heroSection = textSettingsHeading.closest("section");
+
+    expect(heroSection).toHaveClass("lg:grid-cols-[minmax(0,0.95fr)_320px]");
+    expect(heroSection).toHaveClass("lg:items-start");
   });
 
   it("uses a transparent background checkbox to control preview and PNG backgrounds", async () => {

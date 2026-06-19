@@ -14,4 +14,11 @@ describe("Button", () => {
     expect(button.className).not.toContain("hover:-translate");
     expect(button.className).not.toContain("active:translate");
   });
+
+  it("does not include animated borders by default", () => {
+    render(<Button>Plain button</Button>);
+
+    expect(screen.getByRole("button", { name: "Plain button" })).toBeInTheDocument();
+    expect(screen.queryByTestId("animated-button-border")).not.toBeInTheDocument();
+  });
 });

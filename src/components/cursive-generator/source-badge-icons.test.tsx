@@ -39,14 +39,14 @@ describe("SourceBadgeIcons", () => {
     ).toBeInTheDocument();
   });
 
-  it("uses text-white when selected", () => {
+  it("keeps icon color unchanged when selected", () => {
     render(<SourceBadgeIcons badges={["IG"]} isSelected={true} />);
 
     expect(
       screen.getByRole("img", {
         name: "Recommended platforms: Instagram"
       })
-    ).toHaveClass("text-white");
+    ).toHaveClass("text-ink");
   });
 
   it("renders nothing when badges are empty", () => {

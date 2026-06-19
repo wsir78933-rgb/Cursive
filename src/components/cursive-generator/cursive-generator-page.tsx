@@ -1,6 +1,7 @@
 "use client";
 
 import { sendGAEvent } from "@next/third-parties/google";
+import { Copy, Download, Eye } from "lucide-react";
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 
 import { FaqSection } from "./faq-section";
@@ -9,7 +10,8 @@ import { GeneratorHeader } from "./generator-header";
 import { GeneratorToolbar } from "./generator-toolbar";
 import { PreviewDialog } from "./preview-dialog";
 import { StyleFilterTabs } from "./style-filter-tabs";
-import { StylePreviewPanel } from "./style-preview-panel";
+import { AnimatedButtonBorder } from "./animated-button-border";
+import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { writeClipboardText } from "@/lib/clipboard-writer";
 import { saveNodeAsPng } from "@/lib/export-image";
@@ -100,7 +102,7 @@ export function CursiveGeneratorPage({ dictionary, locale }: CursiveGeneratorPag
   const characterCountHintClassName = getCharacterCountHintClassName(
     isOverSuggestedInputCharacterCount
   );
-  const characterCountHint = `${inputCharacterCount} / ${dictionary.inputCharacterCount.suggestedPrefix} ${suggestedInputCharacterCount} ${dictionary.inputCharacterCount.suggestedSuffix}`;
+  const characterCountHint = `${inputCharacterCount} / ${suggestedInputCharacterCount}`;
 
   useEffect(() => {
     return () => {
@@ -197,7 +199,7 @@ export function CursiveGeneratorPage({ dictionary, locale }: CursiveGeneratorPag
     <main className="min-h-screen">
       <GeneratorHeader dictionary={dictionary} locale={locale} />
 
-      <section className="mx-auto grid w-full max-w-7xl gap-6 px-4 pb-8 pt-4 md:px-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(420px,1.05fr)] lg:items-start lg:pb-10 lg:pt-8">
+      <section className="mx-auto grid w-full max-w-7xl gap-6 px-4 pb-8 pt-4 md:px-8 lg:grid-cols-[minmax(0,0.95fr)_320px] lg:items-start lg:pb-10 lg:pt-8">
         <div className="grid gap-5 lg:pt-8">
           <div>
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.26em] text-accent">
@@ -211,7 +213,15 @@ export function CursiveGeneratorPage({ dictionary, locale }: CursiveGeneratorPag
             </p>
           </div>
 
-          <div className="rounded-[2rem] border border-slate-200 bg-white/85 p-3 shadow-sm backdrop-blur">
+          <div
+            className="relative overflow-hidden rounded-[2rem] border border-slate-200 bg-white/85 p-3 shadow-sm backdrop-blur"
+            data-testid="homepage-input-container"
+          >
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 rounded-[2rem] border border-accent/50"
+              data-testid="homepage-input-decorative-border"
+            />
             <label className="sr-only" htmlFor="generator-input">
               {dictionary.inputLabel}
             </label>
@@ -224,33 +234,51 @@ export function CursiveGeneratorPage({ dictionary, locale }: CursiveGeneratorPag
             />
             <p className={characterCountHintClassName}>{characterCountHint}</p>
           </div>
+
+          <div className="flex flex-wrap gap-3">
+            <Button
+              className="relative overflow-hidden"
+              onClick={handleCopy}
+              type="button"
+              variant="accent"
+            >
+              <AnimatedButtonBorder />
+              <Copy className="relative z-10 h-4 w-4" />
+              <span className="relative z-10">{copyLabel}</span>
+            </Button>
+            <Button
+              className="relative overflow-hidden"
+              onClick={handleSave}
+              type="button"
+              variant="outline"
+            >
+              <AnimatedButtonBorder />
+              <Download className="relative z-10 h-4 w-4" />
+              <span className="relative z-10">{dictionary.actions.save}</span>
+            </Button>
+            <Button
+              className="relative hidden overflow-hidden sm:inline-flex"
+              onClick={openPreview}
+              type="button"
+              variant="outline"
+            >
+              <AnimatedButtonBorder />
+              <Eye className="relative z-10 h-4 w-4" />
+              <span className="relative z-10">{dictionary.actions.preview}</span>
+            </Button>
+          </div>
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
-          <StylePreviewPanel
-            copyLabel={copyLabel}
-            dictionary={dictionary}
-            fontSize={fontSize}
-            onCopy={handleCopy}
-            onPreview={openPreview}
-            onSave={handleSave}
-            previewText={selectedPreviewText}
-            selectedStyle={selectedStyle}
-            textColor={textColor}
-            transparentBackground={transparentBackground}
-          />
-
-          <GeneratorToolbar
-            dictionary={dictionary}
-            fontSize={fontSize}
-            onClear={handleClear}
-            onFontSizeChange={setFontSize}
-            onTextColorChange={setTextColor}
-            onTransparentBackgroundChange={setTransparentBackground}
-            textColor={textColor}
-            transparentBackground={transparentBackground}
-          />
-        </div>
+        <GeneratorToolbar
+          dictionary={dictionary}
+          fontSize={fontSize}
+          onClear={handleClear}
+          onFontSizeChange={setFontSize}
+          onTextColorChange={setTextColor}
+          onTransparentBackgroundChange={setTransparentBackground}
+          textColor={textColor}
+          transparentBackground={transparentBackground}
+        />
       </section>
 
       <StyleFilterTabs

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { AnimatedButtonBorder } from "./animated-button-border";
 import { Button } from "@/components/ui/button";
 import type { getDictionary, Locale } from "@/lib/i18n";
 
@@ -36,8 +37,11 @@ export function GeneratorHeader({ dictionary, locale }: GeneratorHeaderProps) {
         <Button asChild size="sm" variant="ghost">
           <Link href={faqHref}>FAQ</Link>
         </Button>
-        <Button asChild size="sm" variant="outline">
-          <Link href={nextLocaleHref}>{localeLabel}</Link>
+        <Button asChild className="relative overflow-hidden" size="sm" variant="outline">
+          <Link href={nextLocaleHref}>
+            <AnimatedButtonBorder />
+            <span className="relative z-10">{localeLabel}</span>
+          </Link>
         </Button>
       </nav>
     </header>

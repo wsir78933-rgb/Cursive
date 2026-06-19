@@ -1,5 +1,3 @@
-import { cn } from "@/lib/utils";
-
 export type SupportedSourceBadge = "IG" | "TT" | "YT" | "G" | "W";
 
 type SourceBadgeIconsProps = {
@@ -71,7 +69,7 @@ const sourceBadgeIconConfigs: Record<SupportedSourceBadge, SourceBadgeIconConfig
   }
 };
 
-export function SourceBadgeIcons({ badges, isSelected }: SourceBadgeIconsProps) {
+export function SourceBadgeIcons({ badges }: SourceBadgeIconsProps) {
   if (badges.length === 0) {
     return null;
   }
@@ -82,10 +80,7 @@ export function SourceBadgeIcons({ badges, isSelected }: SourceBadgeIconsProps) 
   return (
     <div
       aria-label={`Recommended platforms: ${platformNames}`}
-      className={cn(
-        "absolute left-3 top-3 flex items-center gap-1.5 leading-none",
-        isSelected ? "text-white" : "text-ink"
-      )}
+      className="absolute left-3 top-3 flex items-center gap-1.5 leading-none text-ink"
       role="img"
     >
       {iconConfigs.map((iconConfig) => (

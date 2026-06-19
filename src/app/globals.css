@@ -28,3 +28,58 @@ button,
 input {
   font: inherit;
 }
+
+@keyframes font-card-border-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.font-card-animated-border::before,
+.font-card-animated-border::after {
+  position: absolute;
+  pointer-events: none;
+  content: "";
+  border-radius: inherit;
+}
+
+.font-card-animated-border::before {
+  inset: -45%;
+  z-index: 0;
+  background: conic-gradient(
+    from 90deg,
+    transparent 0deg,
+    transparent 72deg,
+    rgba(10, 143, 124, 0.1) 96deg,
+    rgba(10, 143, 124, 0.95) 132deg,
+    rgba(28, 36, 48, 0.42) 168deg,
+    transparent 220deg,
+    transparent 360deg
+  );
+  animation: font-card-border-spin 5s linear infinite;
+  animation-play-state: paused;
+}
+
+.font-card-animated-border::after {
+  inset: 2px;
+  z-index: 0;
+  background: #ffffff;
+  border-radius: calc(1.35rem - 2px);
+}
+
+.font-card-animated-border:hover::before,
+.font-card-animated-border:focus-within::before,
+.selected-font-card-border::before {
+  animation-play-state: running;
+}
+
+.font-card-animated-border > * {
+  position: relative;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .font-card-animated-border::before {
+    animation: none;
+  }
+}

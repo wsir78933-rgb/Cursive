@@ -38,6 +38,27 @@ describe("FontCard", () => {
     expect(screen.getByText(longPreviewText)).not.toHaveClass("overflow-visible");
   });
 
+  it("adds the animated border treatment to each font card", () => {
+    const unicodeScriptStyle = findTextStyleById("unicode-script");
+
+    render(
+      <FontCard
+        dictionary={getDictionary("en")}
+        isCopied={false}
+        isSelected={false}
+        onCopy={vi.fn()}
+        onPreview={vi.fn()}
+        onSelect={vi.fn()}
+        previewText="hello world"
+        textStyle={unicodeScriptStyle}
+      />
+    );
+
+    const fontCard = screen.getByRole("button", { name: "Unicode Script" }).closest("article");
+
+    expect(fontCard).toHaveClass("font-card-animated-border");
+  });
+
   it("keeps the style name accessible without rendering it as card text", () => {
     const onSelect = vi.fn();
     const unicodeScriptStyle = findTextStyleById("unicode-script");
@@ -194,7 +215,7 @@ describe("FontCard", () => {
     expect(screen.getByTestId("source-icon-word")).toBeInTheDocument();
   });
 
-  it("uses a darker selected surface with white selected content", () => {
+  it("uses only a selected border effect without turning the card surface green", () => {
     const pacificoStyle = findTextStyleById("pacifico");
 
     render(
@@ -214,11 +235,13 @@ describe("FontCard", () => {
     const selectedCard = selectButton.closest("article");
     const selectedSourceIcon = screen.getByRole("img", { name: "Recommended platforms: Google" });
 
-    expect(selectedCard).toHaveClass("bg-[#087565]");
+    expect(selectedCard).toHaveClass("bg-white/90");
+    expect(selectedCard).not.toHaveClass("bg-[#087565]");
     expect(selectedCard).toHaveClass("border-[#087565]");
+    expect(selectedCard).toHaveClass("selected-font-card-border");
     expect(selectButton).toHaveAttribute("aria-pressed", "true");
-    expect(selectedSourceIcon).toHaveClass("text-white");
-    expect(screen.getByText("hello world")).toHaveClass("text-white");
+    expect(selectedSourceIcon).toHaveClass("text-ink");
+    expect(screen.getByText("hello world")).toHaveClass("text-ink");
     expect(screen.queryByText(pacificoStyle.displayName)).not.toBeInTheDocument();
   });
 });

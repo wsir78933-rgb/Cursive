@@ -1,3 +1,11 @@
+import * as React from "react";
+
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
+} from "@/components/ui/accordion";
 import type { getDictionary } from "@/lib/i18n";
 
 type Dictionary = ReturnType<typeof getDictionary>;
@@ -7,6 +15,8 @@ type FaqSectionProps = {
 };
 
 export function FaqSection({ dictionary }: FaqSectionProps) {
+  const [openFaqValue, setOpenFaqValue] = React.useState("");
+
   return (
     <section className="mx-auto w-full max-w-7xl px-4 pb-20 pt-4 md:px-8" id="faq">
       <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
@@ -57,17 +67,34 @@ export function FaqSection({ dictionary }: FaqSectionProps) {
 
       <div className="mt-10">
         <h2 className="mb-4 text-2xl font-semibold text-ink">{dictionary.faq.title}</h2>
-        <div className="grid gap-3 md:grid-cols-3">
-          {dictionary.faq.items.map((item) => (
-            <article
-              className="rounded-[1.5rem] border border-slate-200 bg-white/85 p-5 shadow-sm"
-              key={item.question}
-            >
-              <h3 className="mb-2 text-base font-semibold text-ink">{item.question}</h3>
-              <p className="text-sm leading-6 text-slate-700">{item.answer}</p>
-            </article>
-          ))}
-        </div>
+        <Accordion
+          className="grid gap-3"
+          collapsible
+          onValueChange={setOpenFaqValue}
+          type="single"
+          value={openFaqValue}
+        >
+          {dictionary.faq.items.map((item, index) => {
+            const faqValue = `faq-${index}`;
+
+            return (
+              <AccordionItem
+                className="rounded-[1.5rem] border border-slate-200 bg-white/85 px-5 shadow-sm"
+                key={item.question}
+                onMouseEnter={() => setOpenFaqValue(faqValue)}
+                onMouseLeave={() => {
+                  setOpenFaqValue((currentValue) =>
+                    currentValue === faqValue ? "" : currentValue
+                  );
+                }}
+                value={faqValue}
+              >
+                <AccordionTrigger>{item.question}</AccordionTrigger>
+                <AccordionContent>{item.answer}</AccordionContent>
+              </AccordionItem>
+            );
+          })}
+        </Accordion>
       </div>
     </section>
   );

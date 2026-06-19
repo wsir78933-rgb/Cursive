@@ -57,4 +57,23 @@ describe("FontGrid", () => {
     expect(fontGrid).toHaveClass("xl:grid-cols-5");
     expect(fontGrid).not.toHaveClass("xl:grid-cols-4");
   });
+
+  it("labels the font style grid section", () => {
+    render(
+      <FontGrid
+        copiedStyleId={null}
+        dictionary={getDictionary("en")}
+        onCopyStyle={vi.fn()}
+        onPreviewStyle={vi.fn()}
+        onSelectStyle={vi.fn()}
+        previewTextByStyleId={() => "hello world"}
+        selectedStyle={textStyles[0]}
+        styles={textStyles.slice(0, 3)}
+      />
+    );
+
+    expect(screen.getByRole("region", { name: "Cursive font styles" })).toHaveClass(
+      "grid"
+    );
+  });
 });

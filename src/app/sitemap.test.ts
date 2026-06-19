@@ -20,7 +20,19 @@ describe("sitemap", () => {
     for (const entry of entries) {
       expect(entry.changeFrequency).toBe("weekly");
       expect(entry.priority).toBe(1);
-      expect(entry.lastModified).toEqual(new Date("2026-06-11T00:00:00.000Z"));
+      expect(entry.lastModified).toEqual(new Date("2026-06-19T00:00:00.000Z"));
+    }
+  });
+
+  it("sets hreflang alternates for every sitemap entry", () => {
+    const entries = sitemap();
+
+    for (const entry of entries) {
+      expect(entry.alternates?.languages).toEqual({
+        en: "https://cursivegenerator.pro",
+        zh: "https://cursivegenerator.pro/zh/cursive-text-generator",
+        "x-default": "https://cursivegenerator.pro"
+      });
     }
   });
 });

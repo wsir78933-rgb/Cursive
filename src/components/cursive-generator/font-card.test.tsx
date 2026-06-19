@@ -59,7 +59,7 @@ describe("FontCard", () => {
     expect(fontCard).toHaveClass("font-card-animated-border");
   });
 
-  it("keeps the style name accessible without rendering it as card text", () => {
+  it("renders the style name as visible card text", () => {
     const onSelect = vi.fn();
     const unicodeScriptStyle = findTextStyleById("unicode-script");
 
@@ -79,12 +79,39 @@ describe("FontCard", () => {
     const selectButton = screen.getByRole("button", { name: "Unicode Script" });
 
     expect(selectButton).toBeInTheDocument();
-    expect(screen.queryByText("Unicode Script")).not.toBeInTheDocument();
+    expect(screen.getByText("Unicode Script")).toBeVisible();
     expect(screen.queryByRole("button", { name: /Recommended platforms/ })).not.toBeInTheDocument();
 
     fireEvent.click(selectButton);
 
     expect(onSelect).toHaveBeenCalledWith(unicodeScriptStyle);
+  });
+
+  it("renders font family names as visible text for preview font cards", () => {
+    const visibleFontStyles = [
+      findTextStyleById("dancing-script"),
+      findTextStyleById("pacifico"),
+      findTextStyleById("brush-script-mt")
+    ];
+
+    for (const textStyle of visibleFontStyles) {
+      const { unmount } = render(
+        <FontCard
+          dictionary={getDictionary("en")}
+          isCopied={false}
+          isSelected={false}
+          onCopy={vi.fn()}
+          onPreview={vi.fn()}
+          onSelect={vi.fn()}
+          previewText="hello world"
+          textStyle={textStyle}
+        />
+      );
+
+      expect(screen.getByText(textStyle.displayName)).toBeVisible();
+
+      unmount();
+    }
   });
 
   it("does not show extra copyable status inside copyable cards", () => {
@@ -242,6 +269,6 @@ describe("FontCard", () => {
     expect(selectButton).toHaveAttribute("aria-pressed", "true");
     expect(selectedSourceIcon).toHaveClass("text-ink");
     expect(screen.getByText("hello world")).toHaveClass("text-ink");
-    expect(screen.queryByText(pacificoStyle.displayName)).not.toBeInTheDocument();
+    expect(screen.getByText(pacificoStyle.displayName)).toBeVisible();
   });
 });

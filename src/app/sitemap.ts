@@ -1,8 +1,8 @@
 import type { MetadataRoute } from "next";
 
-import { canonicalUrls } from "@/lib/site-url";
+import { canonicalUrls, hreflangAlternates } from "@/lib/site-url";
 
-const sitemapLastModified = new Date("2026-06-11T00:00:00.000Z");
+const sitemapLastModified = new Date("2026-06-19T00:00:00.000Z");
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
@@ -10,13 +10,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: canonicalUrls.en,
       lastModified: sitemapLastModified,
       changeFrequency: "weekly",
-      priority: 1
+      priority: 1,
+      alternates: {
+        languages: hreflangAlternates
+      }
     },
     {
       url: canonicalUrls.zh,
       lastModified: sitemapLastModified,
       changeFrequency: "weekly",
-      priority: 1
+      priority: 1,
+      alternates: {
+        languages: hreflangAlternates
+      }
     }
   ];
 }

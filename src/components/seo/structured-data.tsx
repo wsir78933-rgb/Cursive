@@ -1,16 +1,10 @@
 import type { Locale } from "@/lib/i18n";
-import { canonicalUrls } from "@/lib/site-url";
+import { canonicalUrls, siteOrigin } from "@/lib/site-url";
 
 type StructuredDataDictionary = {
   brand: string;
   hero: {
     description: string;
-  };
-  faq: {
-    items: Array<{
-      question: string;
-      answer: string;
-    }>;
   };
 };
 
@@ -21,35 +15,24 @@ type StructuredDataProps = {
 
 export function StructuredData({ dictionary, locale }: StructuredDataProps) {
   const canonicalUrl = canonicalUrls[locale];
+  const organizationLogoUrl = `${siteOrigin}/icon.svg`;
+  const organizationImageUrl = `${siteOrigin}/og-image.png`;
   const jsonLdItems = [
     {
       "@context": "https://schema.org",
-      "@type": "WebApplication",
+      "@type": "WebSite",
       name: dictionary.brand,
       url: canonicalUrl,
-      applicationCategory: "DesignApplication",
-      operatingSystem: "Web",
       inLanguage: locale,
-      description: dictionary.hero.description,
-      offers: {
-        "@type": "Offer",
-        price: "0",
-        priceCurrency: "USD"
-      }
+      description: dictionary.hero.description
     },
     {
       "@context": "https://schema.org",
-      "@type": "FAQPage",
-      url: canonicalUrl,
-      inLanguage: locale,
-      mainEntity: dictionary.faq.items.map((faqItem) => ({
-        "@type": "Question",
-        name: faqItem.question,
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: faqItem.answer
-        }
-      }))
+      "@type": "Organization",
+      name: "Cursive Generator",
+      url: siteOrigin,
+      logo: organizationLogoUrl,
+      image: organizationImageUrl
     }
   ];
 

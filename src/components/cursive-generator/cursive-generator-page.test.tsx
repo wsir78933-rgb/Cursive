@@ -394,6 +394,7 @@ describe("CursiveGeneratorPage", () => {
 
     const exportOutput = screen.getByTestId("png-export-output");
 
+    expect(exportOutput).toHaveAttribute("aria-hidden", "true");
     expect(exportOutput.style.boxSizing).toBe("border-box");
     expect(exportOutput.style.width).toBe("620px");
     expect(exportOutput.style.maxWidth).toBe("620px");

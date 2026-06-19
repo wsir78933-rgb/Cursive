@@ -9,10 +9,10 @@ const dictionary = getDictionary("zh");
 const chineseTitle = dictionary.title;
 const chineseDescription = "输入文本，选择花体样式，复制、预览或保存为 PNG。";
 const ogImage = {
-  url: "/og-image.png",
+  url: "/og-image-zh.png",
   width: 1200,
   height: 630,
-  alt: "Cursive Generator - Create Cursive Text Online for Free"
+  alt: chineseTitle
 };
 
 export const metadata: Metadata = {

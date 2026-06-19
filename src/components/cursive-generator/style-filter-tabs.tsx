@@ -32,7 +32,10 @@ export const StyleFilterTabs = memo(function StyleFilterTabs({
   onFilterChange
 }: StyleFilterTabsProps) {
   return (
-    <section className="mx-auto mb-6 w-full max-w-7xl px-4 md:px-8">
+    <section
+      aria-label="Cursive style filters"
+      className="mx-auto mb-6 w-full max-w-7xl px-4 md:px-8"
+    >
       <div className="flex gap-2 overflow-x-auto rounded-full border border-slate-200 bg-white/75 p-1 shadow-sm backdrop-blur">
         {filterOptions.map((filterOption) => {
           const isSelected = selectedFilter === filterOption.value;

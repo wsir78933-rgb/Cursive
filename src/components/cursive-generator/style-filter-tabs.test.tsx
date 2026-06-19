@@ -51,4 +51,19 @@ describe("StyleFilterTabs", () => {
 
     expect(handleFilterChange).toHaveBeenCalledWith("ms-word");
   });
+
+  test("labels the style filter section", () => {
+    render(
+      <StyleFilterTabs
+        dictionary={getDictionary("en")}
+        filterOptions={filterOptions}
+        onFilterChange={vi.fn()}
+        selectedFilter="all"
+      />
+    );
+
+    expect(screen.getByRole("region", { name: "Cursive style filters" })).toHaveClass(
+      "max-w-7xl"
+    );
+  });
 });

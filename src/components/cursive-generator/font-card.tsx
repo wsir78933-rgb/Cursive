@@ -62,6 +62,9 @@ export const FontCard = memo(function FontCard({
         >
           {previewText || "\u00a0"}
         </div>
+        <span className="mt-3 max-w-full truncate text-xs font-semibold leading-snug text-slate-500">
+          {textStyle.displayName}
+        </span>
       </button>
       <button
         aria-label={actionLabel}

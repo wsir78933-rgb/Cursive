@@ -68,10 +68,10 @@ describe("ChineseCursiveTextGeneratorPage", () => {
       alternateLocale: "en_US",
       images: [
         {
-          url: "/og-image.png",
+          url: "/og-image-zh.png",
           width: 1200,
           height: 630,
-          alt: "Cursive Generator - Create Cursive Text Online for Free"
+          alt: "花体英文生成器"
         }
       ]
     });
@@ -79,7 +79,7 @@ describe("ChineseCursiveTextGeneratorPage", () => {
       card: "summary_large_image",
       title: "花体英文生成器",
       description: "输入文本，选择花体样式，复制、预览或保存为 PNG。",
-      images: ["/og-image.png"]
+      images: ["/og-image-zh.png"]
     });
   });
 });

@@ -316,6 +316,7 @@ export function CursiveGeneratorPage({ dictionary, locale }: CursiveGeneratorPag
 
       <div className="pointer-events-none fixed -left-[9999px] top-0">
         <div
+          aria-hidden="true"
           data-testid="png-export-output"
           ref={exportNodeRef}
           style={{
